@@ -2,7 +2,7 @@ const Listing = require("../models/listing");
 
 module.exports.index = async (req, res) => {
     const allListings = await Listing.find({});
-    res.render("listings/index.ejs", { allListings });
+    return res.render("listings/index.ejs", { allListings });
 };
 
 module.exports.renderNewForm = (req, res) => {
@@ -24,7 +24,7 @@ module.exports.showListing = async (req, res) => {
         return res.redirect("/listings");
     }
     console.log(listing);
-    res.render("listings/show.ejs", { listing });
+    return res.render("listings/show.ejs", { listing });
 };
 
 module.exports.createListing = async (req, res, next) => {
@@ -36,7 +36,7 @@ module.exports.createListing = async (req, res, next) => {
     newListing.image = { url, filename };
     await newListing.save();
     req.flash("success", "New Listing Created!");
-    res.redirect("/listings");
+    return res.redirect("/listings");
 };
 
 module.exports.renderEditForm = async (req, res) => {
@@ -50,7 +50,7 @@ module.exports.renderEditForm = async (req, res) => {
     let originalImageUrl = listing.image.url;
     originalImageUrl = originalImageUrl.replace("/upload" , "/upload/w_250");
 
-    res.render("listings/edit.ejs", { listing, originalImageUrl })
+    return res.render("listings/edit.ejs", { listing, originalImageUrl })
 };
 
 module.exports.updateListing = async (req, res) => {
@@ -65,7 +65,7 @@ module.exports.updateListing = async (req, res) => {
     }
 
     req.flash("success", "Listing Updated!")
-    res.redirect(`/listings/${id}`);
+    return res.redirect(`/listings/${id}`);
 };
 
 module.exports.destroyListing = async (req, res) => {
@@ -73,5 +73,5 @@ module.exports.destroyListing = async (req, res) => {
     let deletedListing = await Listing.findByIdAndDelete(id);
     console.log(deletedListing);
     req.flash("success", "Listing Deleted!")
-    res.redirect("/listings");
+    return res.redirect("/listings");
 };
