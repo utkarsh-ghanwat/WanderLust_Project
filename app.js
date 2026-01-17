@@ -40,11 +40,21 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
-const store = MongoStore.create({
+
+  
+const store = MongoStore.create({                 // MAM
     mongoUrl: dbUrl,
-    crypto: { secret: process.env.SECRET },
+    // crypto: { secret: process.env.SECRET },
     touchAfter: 24 * 3600
 });
+// const store = MongoStore.create({          // GPT
+//     clientPromise: mongoose.connection.asPromise().then(conn => conn.getClient()),
+//     touchAfter: 24 * 3600,
+// });
+
+store.on("error", () => {
+    console.log("ERROR in mongo store" ,err);
+})
 
 const sessionOptions = {
     store,
@@ -82,10 +92,16 @@ app.use((req, res, next) => {
     next(new ExpressError(404, "Page not found!"));
 });
 
-app.use((err, req, res, next) => {
+// app.use((err, req, res, next) => {        // MAM
+//     const { statusCode = 500, message = "Something went wrong" } = err;
+//     res.status(statusCode).render("error.ejs", { message });
+// });
+app.use((err, req, res, next) => {         // TA
     const { statusCode = 500, message = "Something went wrong" } = err;
+    if (res.headersSent) return next(err);   // IMPORTANT
     res.status(statusCode).render("error.ejs", { message });
 });
+
 
 app.listen(8080, () => {
     console.log("server is listening to port 8080");
