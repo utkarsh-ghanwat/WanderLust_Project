@@ -29,32 +29,39 @@ module.exports.isOwner = async (req, res, next) => {
     next();
 }
 
-module.exports.validateListing = (req, res, next) =>{
-    let {error} = listingSchema.validate(req.body);
-    if(error) {
-        throw new ExpressError(400, error);
-    } else {
-        next();
-    }
-}
-
-// module.exports.validateListing = (req, res, next) => {
+// module.exports.validateListing = (req, res, next) =>{
 //     let {error} = listingSchema.validate(req.body);
 //     if(error) {
-//         let errMsg = error.details.map((el) => el.message).join(",");
-//         return next(new ExpressError(400, errMsg));  // Pass error to next()
+//         throw new ExpressError(400, error);
 //     } else {
 //         next();
 //     }
 // }
-
-module.exports.validateReview = (req, res, next) =>{
-    let {error} = reviewSchema.validate(req.body);
-    if(error) {
-        throw new ExpressError(400, error);
-    } else {
-        next();
+module.exports.validateListing = (req, res, next) => {
+    const { error } = listingSchema.validate(req.body);
+    if (error) {
+        const errMsg = error.details.map(el => el.message).join(",");
+        return next(new ExpressError(400, errMsg));
     }
+    next();
+};
+
+
+// module.exports.validateReview = (req, res, next) =>{
+//     let {error} = reviewSchema.validate(req.body);
+//     if(error) {
+//         throw new ExpressError(400, error);
+//     } else {
+//         next();
+//     }
+// };
+module.exports.validateReview = (req, res, next) => {
+    const { error } = reviewSchema.validate(req.body);
+    if (error) {
+        const errMsg = error.details.map(el => el.message).join(",");
+        return next(new ExpressError(400, errMsg));
+    }
+    next();
 };
 
 
