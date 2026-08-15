@@ -22,6 +22,9 @@ const userRouter = require("./routes/user.js");
 
 const dbUrl = process.env.ATLASDB_URL;
 
+console.log("DB URL exists:", !!process.env.ATLASDB_URL);
+console.log(process.env.ATLASDB_URL?.replace(/\/\/.*:.*@/, "//<hidden>:<hidden>@"));
+
 main().then(() => {
     console.log("connected to DB");
 }).catch(err => {
@@ -87,6 +90,10 @@ app.use((req, res, next) => {
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
+
+app.get("/", (req, res) => {
+    res.send("WanderLust server is running!");
+});
 
 app.use((req, res, next) => {
     next(new ExpressError(404, "Page not found!"));
