@@ -19,6 +19,7 @@ const User = require("./models/user.js");
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
+const bookingRouter = require("./routes/booking");
 
 const dbUrl = process.env.ATLASDB_URL;
 
@@ -81,9 +82,9 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
-  res.locals.success = req.flash("success") || [];
-  res.locals.error = req.flash("error") || [];
-  res.locals.currUser = req.user || null;
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  res.locals.currentUser = req.user;   // ✅ correct name
   next();
 });
 
@@ -94,6 +95,14 @@ app.get("/", (req, res) => {
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
+app.use("/listings/:id/book", bookingRouter);
+
+
+app.get("/flash-test", (req, res) => {
+    req.flash("success", "Flash is working!");
+    res.redirect("/listings");
+});
+
 
 
 app.use((req, res, next) => {
@@ -109,6 +118,7 @@ app.use((err, req, res, next) => {         // TA
     if (res.headersSent) return next(err);   // IMPORTANT
     res.status(statusCode).render("error.ejs", { message });
 });
+
 
 
 app.listen(8080, () => {

@@ -43,5 +43,4 @@ router
     )
         .delete(isLoggedIn, isOwner, wrapAsync(listingController.destroyListing));
 
-
 module.exports = router;

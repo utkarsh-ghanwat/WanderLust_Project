@@ -17,6 +17,39 @@
                     </p>
                     <p class="card-text"> &#8377; <%= listing.price.toLocaleString("en-IN")%>
                     </p>
+
+                    <div class="card p-3 shadow-sm">
+                        <h4>₹<%= listing.price %> / night</h4>
+
+                        <form action="/listings/<%= listing._id %>/book" method="POST">
+
+
+                            <div class="mb-3">
+                                <label>Check-in</label>
+                                <input type="date" id="checkIn" name="checkIn" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label>Check-out</label>
+                                <input type="date" id="checkOut" name="checkOut" class="form-control" required>
+                            </div>
+
+                            <hr>
+
+                            <p>Nights: <span id="nights">0</span></p>
+                            <h5>Total: ₹<span id="totalPrice">0</span></h5>
+
+                            <!-- Hidden fields -->
+                            <input type="hidden" id="nightsInput" name="nights">
+                            <input type="hidden" id="totalInput" name="totalPrice">
+
+                            <button class="btn btn-dark w-100" id="reserveBtn" disabled>
+                                Reserve
+                            </button>
+                        </form>
+                    </div>
+
+
                     <p class="card-text">
                         <%= listing.location %>
                     </p>
@@ -30,8 +63,7 @@
 
         <br>
 
-        <% if(currUser && listing.owner._id.equals(currUser._id)) { %>
-            <div class="btns">
+<% if(currentUser && listing.owner._id.equals(currentUser._id)) { %>            <div class="btns">
                 <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark col-1 offset-3 edit-btn">Edit</a>
 
                 <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
@@ -42,7 +74,7 @@
 
                 <div class="col-8 offset-3 mb-3">
                     <hr>
-                    <% if(currUser) { %>
+                    <% if(currentUser) { %>
                         <h4>Leave a Review</h4>
                         <form action="/listings/<%= listing._id %>/reviews" method="POST" novalidate
                             class="needs-validation">
@@ -108,3 +140,7 @@
                             </div>
                 </div>
     </div>
+
+    <input type="hidden" id="listingPrice" value="<%= listing.price %>">
+
+    <script src="/js/booking.js"></script>
