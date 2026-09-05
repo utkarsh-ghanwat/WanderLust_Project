@@ -41,6 +41,7 @@ app.set("views", path.join(__dirname, "views"));
 app.engine("ejs", ejsMate);
 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -56,7 +57,7 @@ const store = MongoStore.create({                 // MAM
 //     touchAfter: 24 * 3600,
 // });
 
-store.on("error", () => {
+store.on("error", (err) => {
     console.log("ERROR in mongo store" ,err);
 })
 
@@ -64,7 +65,7 @@ const sessionOptions = {
     store,
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
         expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
         maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -84,7 +85,9 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
-  res.locals.currentUser = req.user;   // ✅ correct name
+  res.locals.currentUser = req.user;  
+    console.log("FLASH:", res.locals.success, res.locals.error);
+
   next();
 });
 
@@ -98,11 +101,14 @@ app.use("/", userRouter);
 app.use("/listings/:id/book", bookingRouter);
 
 
-app.get("/flash-test", (req, res) => {
+app.get("/flash-test", (req, res, next) => {
     req.flash("success", "Flash is working!");
-    res.redirect("/listings");
-});
 
+    req.session.save((err) => {
+        if (err) return next(err);
+        res.redirect("/listings");
+    });
+});
 
 
 app.use((req, res, next) => {

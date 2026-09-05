@@ -18,6 +18,12 @@ const bookingSchema = new Schema({
     type: String,
     default: "Pending",
   },
+  paymentId: String,
+  orderId: String,
+  paymentStatus: {
+    type: String,
+    default: "Pending"
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Booking", bookingSchema);

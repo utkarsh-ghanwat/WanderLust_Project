@@ -1,29 +1,13 @@
-<% if (typeof success !== "undefined" && success.length > 0) { %>
-  <div
-    class="alert alert-success alert-dismissible fade show"
-    role="alert"
-  >
+<% if (success && success.length > 0) { %>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
     <%= success[0] %>
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="alert"
-      aria-label="Close"
-    ></button>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
   </div>
 <% } %>
 
-<% if (typeof error !== "undefined" && error.length > 0) { %>
-  <div
-    class="alert alert-danger alert-dismissible fade show"
-    role="alert"
-  >
+<% if (error && error.length > 0) { %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
     <%= error[0] %>
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="alert"
-      aria-label="Close"
-    ></button>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
   </div>
 <% } %>

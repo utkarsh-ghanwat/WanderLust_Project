@@ -21,8 +21,7 @@
                     <div class="card p-3 shadow-sm">
                         <h4>₹<%= listing.price %> / night</h4>
 
-                        <form action="/listings/<%= listing._id %>/book" method="POST">
-
+                        <form id="bookingForm">
 
                             <div class="mb-3">
                                 <label>Check-in</label>
@@ -63,7 +62,8 @@
 
         <br>
 
-<% if(currentUser && listing.owner._id.equals(currentUser._id)) { %>            <div class="btns">
+        <% if(currentUser && listing.owner._id.equals(currentUser._id)) { %>
+            <div class="btns">
                 <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark col-1 offset-3 edit-btn">Edit</a>
 
                 <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
@@ -144,3 +144,64 @@
     <input type="hidden" id="listingPrice" value="<%= listing.price %>">
 
     <script src="/js/booking.js"></script>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+        const form = document.getElementById("bookingForm");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            // 1. Create Razorpay Order
+            const res = await fetch("/listings/<%= listing._id %>/book/create-order", {
+                method: "POST",
+                body: new URLSearchParams(formData)
+            });
+
+            const data = await res.json();
+
+            // 2. Open Razorpay Popup
+            const options = {
+                key: data.key,
+                amount: data.order.amount,
+                currency: "INR",
+                name: "Wanderlust",
+                description: "Stay Booking",
+                order_id: data.order.id,
+
+                handler: async function (response) {
+
+                    const verify = await fetch("/listings/<%= listing._id %>/book/verify", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_signature: response.razorpay_signature,
+                            checkIn: formData.get("checkIn"),
+                            checkOut: formData.get("checkOut")
+                        })
+                    });
+
+                    const result = await verify.json();
+
+                    if (result.success) {
+                        window.location.href = result.redirect;
+                    } else {
+                        alert(result.message);
+                    }
+                },
+                theme: {
+                    color: "#fe424d"
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+        });
+    </script>
