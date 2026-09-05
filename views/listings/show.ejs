@@ -163,6 +163,11 @@
 
             const data = await res.json();
 
+            if (!res.ok) {
+                window.location.href = data.redirect;
+                return;
+            }
+
             // 2. Open Razorpay Popup
             const options = {
                 key: data.key,
@@ -193,9 +198,10 @@
                     if (result.success) {
                         window.location.href = result.redirect;
                     } else {
-                        alert(result.message);
+                        window.location.reload(); // flash error will appear
                     }
                 },
+
                 theme: {
                     color: "#fe424d"
                 }

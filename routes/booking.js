@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router({ mergeParams: true });
+
 const crypto = require("crypto");
-
-
+const Booking = require("../models/booking");
 const Listing = require("../models/listing");
+
 const bookingController = require("../controllers/bookings");
 const razorpay = require("../utils/razorpay");
 const { isLoggedIn } = require("../middleware");
@@ -21,9 +22,29 @@ router.post("/create-order", isLoggedIn, async (req, res) => {
 
         if (!listing) {
             return res.status(404).json({
-                error: "Listing not found",
+                success: false,
+                redirect: `/listings`
             });
         }
+
+        // Check if dates are already booked
+        const existingBooking = await Booking.findOne({
+            listing: id,
+            checkIn: { $lt: new Date(checkOut) },
+            checkOut: { $gt: new Date(checkIn) },
+        });
+
+        if (existingBooking) {
+            req.flash("error", "These dates are already booked!");
+
+            return req.session.save(() => {
+                res.status(409).json({
+                    success: false,
+                    redirect: `/listings/${id}`
+                });
+            });
+        }
+
 
         const nights = Math.ceil(
             (new Date(checkOut) - new Date(checkIn)) /
@@ -31,8 +52,13 @@ router.post("/create-order", isLoggedIn, async (req, res) => {
         );
 
         if (nights <= 0) {
-            return res.status(400).json({
-                error: "Invalid booking dates",
+            req.flash("error", "Invalid booking dates!");
+
+            return req.session.save(() => {
+                res.status(400).json({
+                    success: false,
+                    redirect: `/listings/${id}`
+                });
             });
         }
 
@@ -72,7 +98,7 @@ router.post("/verify", isLoggedIn, async (req, res) => {
         console.log("VERIFY HIT");
         console.log(req.body);
 
-        
+
 
         // Verify signature
         const generatedSignature = crypto
@@ -81,9 +107,13 @@ router.post("/verify", isLoggedIn, async (req, res) => {
             .digest("hex");
 
         if (generatedSignature !== razorpay_signature) {
-            return res.status(400).json({
-                success: false,
-                message: "Payment verification failed",
+            req.flash("error", "Payment verification failed!");
+
+            return req.session.save(() => {
+                res.status(400).json({
+                    success: false,
+                    redirect: `/listings/${req.params.id}`
+                });
             });
         }
 
