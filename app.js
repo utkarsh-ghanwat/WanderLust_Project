@@ -46,7 +46,7 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
 
-  
+
 const store = MongoStore.create({                 // MAM
     mongoUrl: dbUrl,
     // crypto: { secret: process.env.SECRET },
@@ -58,7 +58,7 @@ const store = MongoStore.create({                 // MAM
 // });
 
 store.on("error", (err) => {
-    console.log("ERROR in mongo store" ,err);
+    console.log("ERROR in mongo store", err);
 })
 
 const sessionOptions = {
@@ -83,12 +83,12 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
-  res.locals.success = req.flash("success");
-  res.locals.error = req.flash("error");
-  res.locals.currentUser = req.user;  
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    res.locals.currentUser = req.user;
     console.log("FLASH:", res.locals.success, res.locals.error);
 
-  next();
+    next();
 });
 
 app.get("/", (req, res) => {
@@ -111,17 +111,16 @@ app.get("/flash-test", (req, res, next) => {
 });
 
 
+
 app.use((req, res, next) => {
     next(new ExpressError(404, "Page not found!"));
 });
 
-// app.use((err, req, res, next) => {        // MAM
-//     const { statusCode = 500, message = "Something went wrong" } = err;
-//     res.status(statusCode).render("error.ejs", { message });
-// });
-app.use((err, req, res, next) => {         // TA
+
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
     const { statusCode = 500, message = "Something went wrong" } = err;
-    if (res.headersSent) return next(err);   // IMPORTANT
     res.status(statusCode).render("error.ejs", { message });
 });
 

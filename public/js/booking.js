@@ -58,7 +58,5 @@ function calculatePrice() {
   reserveBtn.disabled = false;
 }
 
-
-
 checkIn.addEventListener("change", calculatePrice);
 checkOut.addEventListener("change", calculatePrice);

@@ -5,24 +5,23 @@ const Listing = require("../models/listing.js");
 const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
 const listingController = require("../controllers/listing.js");
 const { index } = require("../controllers/listing.js");
- 
-const multer  = require('multer');
-const {storage}  = require('../cloudConfig.js');
+
+const multer = require('multer');
+const { storage } = require('../cloudConfig.js');
 const upload = multer({ storage });
+
 
 // INDEX & CREATE ROUTE
 router
     .route("/")
-    .get(wrapAsync(listingController.index)) 
+    .get(wrapAsync(listingController.index))
     .post(
         isLoggedIn,
         upload.single('listing[image]'),
         validateListing,
         wrapAsync(listingController.createListing)
     );
-    // .post( upload.single('listing[image]'),(req, res) => {
-    //     res.send(req.file)
-    // })
+
 
 // NEW ROUTE
 router.get("/new", isLoggedIn, listingController.renderNewForm);
@@ -34,13 +33,13 @@ router.get("/:id/edit", isLoggedIn, isOwner, wrapAsync(listingController.renderE
 // SHOW, UPDATE & DESTROY ROUTE
 router
     .route("/:id")
-    .get(wrapAsync(listingController.showListing)) 
-    .put(isLoggedIn, 
+    .get(wrapAsync(listingController.showListing))
+    .put(isLoggedIn,
         isOwner,
         upload.single('listing[image]'),
-        validateListing, 
+        validateListing,
         wrapAsync(listingController.updateListing)
     )
-        .delete(isLoggedIn, isOwner, wrapAsync(listingController.destroyListing));
+    .delete(isLoggedIn, isOwner, wrapAsync(listingController.destroyListing));
 
 module.exports = router;
