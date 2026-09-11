@@ -15,6 +15,11 @@ const listingSchema = new Schema({
   price: Number,
   location: String,
   country: String,
+  
+  embedding: {
+    type: [Number],
+    default: undefined,
+},
   reviews: [
     {
       type: Schema.Types.ObjectId,

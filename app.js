@@ -21,6 +21,9 @@ const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 const bookingRouter = require("./routes/booking");
 
+const aiRoute = require("./routes/ai");
+
+
 const dbUrl = process.env.ATLASDB_URL;
 
 console.log("DB URL exists:", !!process.env.ATLASDB_URL);
@@ -44,6 +47,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
+
+
+app.use("/api/ai", aiRoute);
 
 
   
